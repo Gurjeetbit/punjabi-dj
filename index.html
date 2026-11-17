@@ -93,6 +93,26 @@ canvas#tl{width:100%;height:74px;display:block;border-radius:10px;background:#0b
 .sbox small{display:block;color:var(--mu);margin-top:16px;line-height:1.6}
 .stripe{height:4px;margin:18px auto;width:220px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--saf) 0 14px,var(--mag) 14px 28px,var(--tel) 28px 42px,var(--vio) 42px 56px)}
 @media(max-width:700px){header{position:static}#spec{display:none}.note{font-size:34px}}
+nav.views{display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:1500px;margin:16px auto 0;padding:0 14px}
+.vt{background:var(--p2);color:var(--mu);border:1px solid var(--ln);border-radius:12px;padding:10px 18px;font:inherit;font-weight:900;letter-spacing:.12em;font-size:13px;cursor:pointer}
+.vt.on{color:#1d1200;background:linear-gradient(135deg,var(--saf),#ff7a1f);border-color:var(--saf)}
+nav.views .jump{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+nav.views .jump a{color:var(--mu);text-decoration:none;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--ln);border-radius:20px}
+.view{display:flex;flex-direction:column;gap:18px}.view[hidden]{display:none}
+textarea{width:100%;background:#0f0c13;color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:10px;font:12.5px/1.5 ui-monospace,Menlo,monospace;resize:vertical}
+.drop{border:2px dashed #3d3249;border-radius:12px;padding:16px;text-align:center;color:var(--mu);height:100%;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.drop.on{border-color:var(--saf);background:#ffa21f10}
+.crate{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.cr{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:7px 9px;border-radius:10px;background:var(--p2);border:1px solid var(--ln)}
+.cr.ok{border-color:#3d5a33}.cr.off{opacity:.45}.cr.drag{outline:2px dashed var(--saf)}
+.cr .n{width:22px;color:var(--mu);font-weight:800;text-align:center}
+.cr img,.cr .ph{width:64px;height:36px;object-fit:cover;border-radius:6px;background:#2a2233;display:grid;place-items:center;color:var(--mu);flex:none}
+.cr .ci{flex:1;min-width:180px}.cr .ci b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr small{display:block;color:var(--mu);font-size:11.5px}.cr small.good{color:#7ee36f}.cr small.warn{color:#ffb347}.cr a{color:var(--tel)}
+.styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.sty{text-align:left;padding:12px 14px;border-radius:12px;background:var(--p2);border:1px solid var(--ln);cursor:pointer;color:var(--tx);font:inherit}
+.sty b{display:block;font-size:14px;margin-bottom:3px}.sty small{color:var(--mu);font-size:11.5px;line-height:1.4;display:block}
+.sty.on{border-color:var(--saf);box-shadow:0 0 0 1px var(--saf);background:linear-gradient(160deg,#3a2510,var(--p2))}
 footer{color:var(--mu);text-align:center;font-size:11.5px;padding:0 20px 30px}
 </style>
 </head>
@@ -107,9 +127,10 @@ footer{color:var(--mu);text-align:center;font-size:11.5px;padding:0 20px 30px}
   <canvas id="spec"></canvas>
   <div class="hg"><select id="recq" title="Recording format"><option value="flac-24">FLAC 24-bit (lossless)</option><option value="wav-24">WAV 24-bit</option><option value="mp3-320">MP3 320 kbps</option></select><button id="rec" class="btn rec">● REC</button><span id="rect">00:00</span></div>
 </header>
-<nav class="jump"><a href="#s-decks">Decks</a><a href="#s-remix">Auto Remix</a><a href="#s-beat">Beat Maker</a><a href="#s-pads">Sound Pads</a><a href="#s-vocal">Vocal Booth</a><a href="#s-fx">Master FX</a></nav>
+<nav class="views"><button class="vt on" data-view="dj">🎛 DJ STUDIO</button><button class="vt" data-view="mash">🥁 MASHUP STUDIO</button><span class="jump"><a href="#s-decks">Decks</a><a href="#s-beat">Beat Maker</a><a href="#s-pads">Sound Pads</a><a href="#s-vocal">Vocal Booth</a><a href="#s-fx">Master FX</a></span></nav>
 
 <main>
+<div class="view" id="view-dj">
 <section id="s-decks" class="card">
   <h2>Decks <b>A · B · C</b></h2>
   <p class="sub">Drop MP3 / WAV / M4A files on a deck. BPM and beat grid are detected automatically. Click the waveform to jump. SET IN marks where a song enters the auto-remix.</p>
@@ -121,30 +142,6 @@ footer{color:var(--mu);text-align:center;font-size:11.5px;padding:0 20px 30px}
   </div>
 </section>
 
-<section id="s-remix" class="card">
-  <h2>Auto <b>Remix</b> — Stage Mix Builder</h2>
-  <p class="sub">Load 2–3 songs into the decks, then build a staged medley the way competition bhangra mixes are cut: dhol intro, build-up, drops with dhol on top, a dhol &amp; tumbi break, and a speed-up finale. Preview it live, then render a studio-quality WAV.</p>
-  <div class="rxo">
-    <label>Style<select id="rx-style"><option value="stage">Bhangra Stage Mix — dhol, chimta, speed-up</option><option value="club">Club Remix — 808 + dhol, EDM drops</option><option value="mashup">Quick Mashup — 8-bar cuts</option></select></label>
-    <label>Section length<select id="rx-len"><option value="8">8 bars</option><option value="16" selected>16 bars</option><option value="32">32 bars</option></select></label>
-    <label>Master BPM<input id="rx-bpm" type="number" min="60" max="200" step="0.5" placeholder="auto"></label>
-    <label>Dhol level<input id="rx-dhol" type="range" min="0" max="1.3" step="0.01" value="0.75"></label>
-    <label class="ck"><input type="checkbox" id="rx-speed" checked> Speed-up finale</label>
-    <label class="ck"><input type="checkbox" id="rx-keep" checked> Keep vocal pitch</label>
-    <label class="ck"><input type="checkbox" id="rx-shout" checked> Shouts on drops</label>
-  </div>
-  <div class="row" style="margin-top:14px">
-    <button class="btn" id="rx-build">BUILD PLAN</button>
-    <button class="btn on" id="rx-play">▶ PREVIEW LIVE</button>
-    <button class="btn" id="rx-stop">■ STOP</button>
-    <select id="rx-q" title="Download format"><optgroup label="Lossless"><option value="flac-48000-24" selected>FLAC Hi-Res · 48 kHz / 24-bit</option><option value="flac-96000-24">FLAC Ultra HD · 96 kHz / 24-bit</option><option value="wav-48000-24">WAV Studio · 48 kHz / 24-bit</option><option value="wav-96000-24">WAV Ultra HD · 96 kHz / 24-bit</option><option value="wav-44100-16">WAV CD · 44.1 kHz / 16-bit</option></optgroup><optgroup label="Compressed (phones, WhatsApp, car)"><option value="mp3-48000-320">MP3 · 320 kbps (best)</option><option value="mp3-44100-256">MP3 · 256 kbps</option></optgroup></select>
-    <button class="btn mag on" id="rx-render">⬇ RENDER &amp; DOWNLOAD</button>
-    <span id="rx-status" class="sub" style="margin:0"></span>
-  </div>
-  <canvas id="tl"></canvas>
-  <div class="stages" id="stages"></div>
-  <div class="outs" id="outs"></div>
-</section>
 
 <section id="s-beat" class="card">
   <h2>Beat <b>Maker</b> — Dhol &amp; Melody Loops</h2>
@@ -204,6 +201,53 @@ footer{color:var(--mu);text-align:center;font-size:11.5px;padding:0 20px 30px}
     <label><span>Glue compressor<output id="o-gl">50%</output></span><input type="range" id="fx-gl" min="0" max="1" step="0.01" value="0.5"></label>
   </div>
 </section>
+</div>
+<div class="view" id="view-mash" hidden>
+<section id="s-crate" class="card">
+  <h2>Mashup <b>Studio</b> — Your Song List</h2>
+  <p class="sub">Add as many songs as you like. Paste YouTube, YouTube Music or Apple Music links (or just song names) to set the running order, then drop in the audio files. Files whose names match a pasted song attach to it automatically.</p>
+  <div class="two">
+    <div><div class="lbl" style="margin-bottom:6px">Paste links or song names — one per line</div>
+      <textarea id="links" rows="6" placeholder="https://youtu.be/...&#10;https://music.apple.com/in/album/...?i=...&#10;Lover - Diljit Dosanjh"></textarea>
+      <div class="row"><button class="btn on" id="links-add">ADD TO LIST</button><span class="sub" style="margin:0">Browsers can't pull audio out of YouTube or Apple Music, so each link needs its audio file.</span></div></div>
+    <div class="drop" id="crate-drop"><b style="color:var(--tx)">⬇ Drop audio files here</b><span>MP3 · WAV · M4A · FLAC · MP4 — several at once</span><div><label class="btn on">CHOOSE FILES<input type="file" multiple accept="audio/*,video/mp4,.mp3,.wav,.m4a,.aac,.flac,.ogg,.mp4" hidden id="crate-files"></label></div></div>
+  </div>
+  <div class="row" style="margin-top:12px"><span class="lbl" id="crate-info">0 songs ready</span><span style="flex:1"></span><button class="btn sm" id="crate-decks">+ SONGS FROM DECKS</button><button class="btn sm" id="crate-bpm">SORT BY BPM</button><button class="btn sm" id="crate-shuf">SHUFFLE</button><button class="btn sm" id="crate-clear">CLEAR</button></div>
+  <div class="crate" id="crate"></div>
+</section>
+<section id="s-remix" class="card">
+  <h2>Mashup <b>Styles</b> — Build &amp; Download</h2>
+  <p class="sub">Pick a style. Each song's high-energy part is chosen automatically, tempos are matched, and dhol, shouts and effects are laid on top in stages.</p>
+  <div class="styles" id="styles">
+    <button class="sty on" data-style="empire"><b>🏆 Bhangra Empire</b><small>Competition stage mix: dhol intro, build-up, drops, dhol &amp; tumbi breaks, speed-up finale</small></button>
+    <button class="sty" data-style="ksr"><b>💍 DJ KSR wedding mega remix</b><small>Non-stop dhol over 808 kick, shouts on every drop, smooth echo blends</small></button>
+    <button class="sty" data-style="djcuts"><b>✂️ DJ quick-cut mashup</b><small>8-bar hard cuts, scratches and impacts, songs cycle fast</small></button>
+    <button class="sty" data-style="club"><b>🔊 Club remix</b><small>808 + dhol hip-hop, EDM stabs, dhol-trap break</small></button>
+    <button class="sty" data-style="medley"><b>🌊 Non-stop dhol medley</b><small>Long 32-bar sections with gentle filter blends</small></button>
+  </div>
+  <select id="rx-style" hidden><option value="empire">empire</option><option value="ksr">ksr</option><option value="djcuts">djcuts</option><option value="club">club</option><option value="medley">medley</option></select>
+  <div class="rxo" style="margin-top:14px">
+    <label>Section length<select id="rx-len"><option value="0" selected>Auto (per style)</option><option value="8">8 bars</option><option value="16">16 bars</option><option value="32">32 bars</option></select></label>
+    <label>Master BPM<input id="rx-bpm" type="number" min="60" max="200" step="0.5" placeholder="auto"></label>
+    <label>Dhol level<input id="rx-dhol" type="range" min="0" max="1.3" step="0.01" value="0.75"></label>
+    <label class="ck"><input type="checkbox" id="rx-speed" checked> Speed-up finale</label>
+    <label class="ck"><input type="checkbox" id="rx-keep" checked> Keep vocal pitch</label>
+    <label class="ck"><input type="checkbox" id="rx-shout" checked> Shouts on drops</label>
+  </div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn" id="rx-build">BUILD PLAN</button>
+    <button class="btn on" id="rx-play">▶ PREVIEW LIVE</button>
+    <button class="btn" id="rx-stop">■ STOP</button>
+    <select id="rx-q" title="Download format"><optgroup label="Lossless"><option value="flac-48000-24" selected>FLAC Hi-Res · 48 kHz / 24-bit</option><option value="flac-96000-24">FLAC Ultra HD · 96 kHz / 24-bit</option><option value="wav-48000-24">WAV Studio · 48 kHz / 24-bit</option><option value="wav-96000-24">WAV Ultra HD · 96 kHz / 24-bit</option><option value="wav-44100-16">WAV CD · 44.1 kHz / 16-bit</option></optgroup><optgroup label="Compressed (phones, WhatsApp, car)"><option value="mp3-48000-320">MP3 · 320 kbps (best)</option><option value="mp3-44100-256">MP3 · 256 kbps</option></optgroup></select>
+    <button class="btn mag on" id="rx-render">⬇ RENDER &amp; DOWNLOAD</button>
+    <span id="rx-status" class="sub" style="margin:0"></span>
+  </div>
+  <canvas id="tl"></canvas>
+  <div class="stages" id="stages"></div>
+  <div class="lbl" style="margin-top:16px">Your downloads</div>
+  <div class="outs" id="outs"><div class="sub" id="outs-empty" style="margin:4px 0 0">Rendered mashups and REC recordings appear here.</div></div>
+</section>
+</div>
 </main>
 <footer>DholDeck runs entirely in your browser — your songs never leave your device. All instrument sounds are synthesised in real time; no samples are copied from any record. Downloads: FLAC or WAV lossless up to 96 kHz / 24-bit, or MP3 at 320 kbps.</footer>
 <div id="toast"></div>
@@ -358,6 +402,7 @@ const PRESET_SRC={
  'Bhangra Hip-Hop':{'808 Kick':'X......X..X.....','Clap':'....X.......X...','Hi-Hat':'x.x.x.x.x.x.x.x.','Dhol Dagga':'X.......X.......','Dhol Tilli':'...X..X....X..X.'},
  'Dhol Trap':{'808 Kick':'X.........X.....','Clap':'........X.......','Hi-Hat':'x.x.x.xxx.x.x.xx','Open Hat':'......X.........','Dhol Dagga':'X.....X.....X...','Dhol Tilli':'...X.....X.....X'},
  'EDM Dhol Drop':{'808 Kick':'X...X...X...X...','Clap':'....X.......X...','Open Hat':'..X...X...X...X.','Dhol Dagga':'X..X..X.X..X..X.','Dhol Tilli':'.X.x.X.x.X.x.X.x','Chimta':'X...X...X...X...'},
+ 'Dhol + 808 (Wedding)':{'808 Kick':'X.......X..X....','Clap':'....X.......X...','Hi-Hat':'x.x.x.x.x.x.x.x.','Dhol Dagga':'X.....X.X.....X.','Dhol Tilli':'..X.x..X..X.x..X','Chimta':'X...X...X...X...'},
  'Keherwa (Tabla)':{'Tabla Ge':'X.....X.X.......','Tabla Na':'..X.X.....X.X.x.'},
  'Clear':{}};
 const PRE={};for(const k in PRESET_SRC){PRE[k]={};for(const r of ROWS){const s=PRESET_SRC[k][r]||'................';PRE[k][r]=[...s].map(c=>c==='X'?1:c==='x'?.55:0)}}
@@ -468,7 +513,7 @@ async function exportAudio(L,R,sr,fmt,q,prog){await new Promise(z=>setTimeout(z,
  if(fmt==='flac'){const b=flacEncode([L,R],sr,q);return{blob:b,ext:'flac',label:`FLAC lossless · ${sr/1000} kHz/${q}-bit`}}
  if(fmt==='mp3'){let s2=sr;if(sr!==44100&&sr!==48000){L=resample(L,sr,48000);R=resample(R,sr,48000);s2=48000}return{blob:await mp3Encode(L,R,s2,q,prog),ext:'mp3',label:`MP3 · ${q} kbps`}}
  return{blob:wav([L,R],sr,q),ext:'wav',label:`WAV · ${sr/1000} kHz/${q}-bit`}}
-function addOutput(blob,name,label){const u=URL.createObjectURL(blob);const d=document.createElement('div');d.className='out';const mb=(blob.size/1048576).toFixed(1);
+function addOutput(blob,name,label){const oe=$('#outs-empty');if(oe)oe.remove();const u=URL.createObjectURL(blob);const d=document.createElement('div');d.className='out';const mb=(blob.size/1048576).toFixed(1);
  d.innerHTML=`<b>${label}</b><audio controls src="${u}"></audio><a href="${u}" download="${name}">⬇ ${name} (${mb} MB)</a>`;$('#outs').prepend(d);
  try{const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove()}catch(e){}}
 
@@ -542,75 +587,90 @@ function clockTick(){const sd=60/S.bpm/4;while(clock.next<ctx.currentTime+.12){c
 const PL={plan:null,running:false,base:0,idx:0,timer:null};
 const SEC_COL={intro:'#7a3cff',build:'#1fd1c1',break:'#e8d84a',finale:'#ff5a1f',outro:'#5d5468'};
 const DECK_COL=['#ffa21f','#ff2f86','#1fd1c1'];
+const PAL=['#ffa21f','#ff2f86','#1fd1c1','#7ee36f','#4aa8ff','#c77dff','#ffd23f','#ff6b6b'];
+const STYLES={
+ empire:{name:'Bhangra Empire stage mix',intro:4,build:4,L:n=>n>6?8:16,breakEvery:2,breakBars:8,finale:8,speed:true,cut:false,reprise:true},
+ ksr:{name:'DJ KSR-style wedding mega remix',intro:4,build:4,L:n=>n>8?8:16,breakEvery:3,breakBars:4,finale:8,speed:false,cut:false,reprise:true},
+ djcuts:{name:'DJ quick-cut mashup',intro:2,build:2,L:()=>8,breakEvery:0,breakBars:0,finale:4,speed:true,cut:true,reprise:false,cycle:true},
+ club:{name:'Club remix',intro:4,build:4,L:()=>16,breakEvery:3,breakBars:4,finale:8,speed:false,cut:false,reprise:true},
+ medley:{name:'Non-stop dhol medley',intro:4,build:4,L:()=>32,breakEvery:0,breakBars:0,finale:8,speed:false,cut:false,reprise:false}};
 function buildPlan(){
- const T=D.filter(d=>d.buf&&d.an);if(T.length<2)throw new Error('Load at least 2 songs into the decks first.');
- const o={style:$('#rx-style').value,L:+$('#rx-len').value,bpm:+$('#rx-bpm').value||0,speed:$('#rx-speed').checked,keep:$('#rx-keep').checked,dhol:+$('#rx-dhol').value,shouts:$('#rx-shout').checked};
+ const T=CR.filter(c=>c.on&&c.buf&&c.an);if(T.length<2)throw new Error('Add at least 2 songs with audio in Mashup Studio first.');
+ const sty=$('#rx-style').value,ST=STYLES[sty];
+ const o={style:sty,L:+$('#rx-len').value||ST.L(T.length),bpm:+$('#rx-bpm').value||0,speed:$('#rx-speed').checked&&ST.speed,keep:$('#rx-keep').checked,dhol:+$('#rx-dhol').value,shouts:$('#rx-shout').checked};
  const bp=T.map(d=>d.an.bpm).sort((a,b)=>a-b);let M=o.bpm||bp[Math.floor((bp.length-1)/2)];M=Math.round(M*2)/2;
  T.forEach(d=>{let m=1,err=9;for(const k of[.5,1,2]){const e=Math.abs(Math.log(M/(d.an.bpm*k)));if(e<err){err=e;m=k}}d.tb=d.an.bpm*m;d.bt=60/d.tb});
- const nm=d=>d.name.replace(/\.[^.]+$/,'').slice(0,34);const secs=[];const add=(name,bars,type,x={})=>secs.push(Object.assign({name,bars,type},x));
- const uses=T.map(()=>0);let songIdx=0;const song=(k,bars)=>{const u=uses[k]++;add(nm(T[k])+(u?' — reprise':''),bars,'song',{tr:k,u,idx:songIdx++})};
- if(o.style==='mashup'){add('Dhol Intro',4,'intro');add('Build-up',2,'build');const seq=T.length===2?[0,1,0,1]:[0,1,2,0,1,2];seq.forEach(k=>song(k,8));add('Finale',4,'finale');add('Outro',2,'outro')}
- else{add('Dhol Intro',4,'intro');add('Build-up',4,'build');song(0,o.L);song(1,o.L);add('Dhol Break',o.style==='club'?4:8,'break');song(T.length>2?2:0,o.L);add('Finale',8,'finale');add('Outro',2,'outro')}
+ const nm=d=>d.name.slice(0,40);const secs=[];const add=(name,bars,type,x={})=>secs.push(Object.assign({name,bars,type},x));
+ const uses=T.map(()=>0);let songIdx=0;const song=(k,bars)=>{const u=uses[k]++;add(nm(T[k])+(u?' — reprise':''),bars,'song',{tr:k,u,idx:songIdx,ch:songIdx%3});songIdx++};
+ add('Dhol Intro',ST.intro,'intro');add('Build-up',ST.build,'build');
+ let seq;
+ if(T.length===2&&ST.reprise)seq=ST.breakBars?[0,1,-1,0]:[0,1,0];
+ else{seq=[];const reps=ST.cycle&&T.length<=3?2:1;for(let r=0;r<reps;r++)T.forEach((_,i)=>seq.push(i));
+  if(ST.breakEvery){const s2=[];seq.forEach((k,i)=>{s2.push(k);if((i+1)%ST.breakEvery===0&&i<seq.length-1)s2.push(-1)});seq=s2}}
+ seq.forEach(k=>k<0?add('Dhol Break',ST.breakBars,'break'):song(k,o.L));
+ add(o.speed?'Finale — Speed-up':'Finale',ST.finale,'finale');add('Outro',2,'outro');
  let b=0;secs.forEach(s=>{s.b0=b;b+=s.bars;s.b1=b});const NB=b;
  const bpmBar=new Array(NB+1).fill(M);const fin=secs.find(s=>s.type==='finale');
- if(fin&&o.speed&&o.style!=='club'){for(let k=0;k<fin.bars;k++)bpmBar[fin.b0+k]=Math.round(M*(1+.2*(k+1)/fin.bars)*10)/10;for(let k=fin.b1;k<=NB;k++)bpmBar[k]=bpmBar[fin.b1-1]}
+ if(fin&&o.speed){for(let k=0;k<fin.bars;k++)bpmBar[fin.b0+k]=Math.round(M*(1+.2*(k+1)/fin.bars)*10)/10;for(let k=fin.b1;k<=NB;k++)bpmBar[k]=bpmBar[fin.b1-1]}
  const barT=[0];for(let i=0;i<NB;i++)barT.push(barT[i]+240/bpmBar[i]);
  const ev=[];const at=(t,fn)=>ev.push({t,fn});
- // ---- songs
  const firstSong=secs.find(s=>s.type==='song');
- secs.forEach((s,si)=>{if(s.type!=='song')return;const d=T[s.tr],j=d.i;let endBar=s.b1;const nx=secs[si+1];if(nx&&nx.type==='finale')endBar=nx.b1;
-  const after=secs.find(x=>x.b0===endBar);const pre=s===firstSong?secs[si-1].bars:(o.style==='mashup'?0:2);
-  const entry=s===firstSong?'hp':(o.style==='mashup'?'cut':'lp');const exit=(!after||after.type==='outro')?'cut':(o.style==='mashup'?'cut':'echo');
+ secs.forEach((s,si)=>{if(s.type!=='song')return;const d=T[s.tr],j=s.ch;let endBar=s.b1;const nx=secs[si+1];if(nx&&nx.type==='finale')endBar=nx.b1;
+  const after=secs.find(x=>x.b0===endBar);const pre=s===firstSong?secs[si-1].bars:(ST.cut?0:sty==='medley'?4:2);
+  const entry=s===firstSong?'hp':(ST.cut?'cut':'lp');const exit=(!after||after.type==='outro')?'cut':(ST.cut?'cut':'echo');
   const spanBeats=4*(endBar-s.b0);let inn=(s.u===0&&d.userIn&&d.inPoint!=null)?d.inPoint:bestStarts(d,4*Math.min(s.bars,o.L),4*pre)[Math.min(s.u,1)];
   inn=Math.max(0,Math.min(inn,d.an.dur-spanBeats*d.bt-.5));if(inn<4*pre*d.bt&&d.an.dur>spanBeats*d.bt+4*pre*d.bt)inn=Math.max(inn,4*pre*d.bt);
   s.inn=inn;const preB=s.b0-pre;let sp=inn-4*pre*d.bt,t0=barT[preB];if(sp<0){t0+=-sp/(bpmBar[preB]/d.tb);sp=0}const tEnd=barT[endBar];const r0=bpmBar[preB]/d.tb;
   at(t0,(E,B)=>{const N=E.decks[j];const src=E.ctx.createBufferSource();src.buffer=d.buf;src.playbackRate.setValueAtTime(r0,B+t0);src.connect(N.tuner);src.start(B+t0,sp);src.stop(B+tEnd+.06);
    E.planSrc=E.planSrc||[];E.planSrc[j]=src;(E.planAll=E.planAll||[]).push(src);setRatio(N.tuner,o.keep?1/r0:1,B+t0);
    const tIn=B+t0,tDrop=B+barT[s.b0];const set=(p,v,t)=>{p.cancelScheduledValues(t);p.setValueAtTime(v,t)};
-   set(N.sendE.gain,0,tIn);set(N.sendR.gain,0,tIn);set(N.low.gain,0,tIn);set(N.mid.gain,0,tIn);set(N.high.gain,0,tIn);set(N.xg.gain,1,tIn);
+   set(N.trim.gain,d.an.trim,tIn);set(N.sendE.gain,0,tIn);set(N.sendR.gain,0,tIn);set(N.low.gain,0,tIn);set(N.mid.gain,0,tIn);set(N.high.gain,0,tIn);set(N.xg.gain,1,tIn);
    if(entry==='hp'){set(N.hp.frequency,2500,tIn);N.hp.frequency.exponentialRampToValueAtTime(20,tDrop);set(N.lp.frequency,E.LP,tIn);set(N.vol.gain,.5,tIn);N.vol.gain.linearRampToValueAtTime(1,tDrop)}
    else if(entry==='lp'){set(N.hp.frequency,20,tIn);set(N.lp.frequency,320,tIn);N.lp.frequency.exponentialRampToValueAtTime(E.LP,tDrop);set(N.vol.gain,.25,tIn);N.vol.gain.linearRampToValueAtTime(1,tDrop)}
    else{set(N.hp.frequency,20,tIn);set(N.lp.frequency,E.LP,tIn);set(N.vol.gain,1,tIn)}
-   if(o.style!=='club')N.low.gain.setValueAtTime(-3,tDrop)});
+   if(sty!=='club')N.low.gain.setValueAtTime(-3,tDrop)});
   for(let x=preB+1;x<endBar;x++)if(bpmBar[x]!==bpmBar[x-1]){const tt=barT[x],r=bpmBar[x]/d.tb;at(tt,(E,B)=>{const src=E.planSrc&&E.planSrc[j];if(!src)return;src.playbackRate.setValueAtTime(r,B+tt);if(o.keep)setRatio(E.decks[j].tuner,1/r,B+tt)})}
   if(exit==='echo'){const ta=barT[endBar-2],te=barT[endBar];at(ta,(E,B)=>{const N=E.decks[j];N.sendE.gain.setValueAtTime(0,B+ta);N.sendE.gain.linearRampToValueAtTime(.75,B+te);N.hp.frequency.setValueAtTime(20,B+ta);N.hp.frequency.exponentialRampToValueAtTime(700,B+te);N.vol.gain.setValueAtTime(1,B+te-.03);N.vol.gain.linearRampToValueAtTime(0,B+te+.02)})}
   else{const te=barT[endBar];at(te-.3,(E,B)=>{const N=E.decks[j];N.vol.gain.setValueAtTime(1,B+te-.015);N.vol.gain.linearRampToValueAtTime(0,B+te)})}
-  s.desc=`${d.name.length?'':''}enters at ${fmt(inn)} · ${pre?`${pre}-bar ${entry==='hp'?'filter rise':'filter blend'} in`:'hard cut'} · ${exit==='echo'?'echo-out':'cut'} at end`});
- // ---- drums & melody per bar
- const drumCfg=(s,k)=>{const last=k===s.bars-1;const st=o.style;
-  if(s.type==='intro')return st==='club'?{pat:'Keherwa (Tabla)',layers:k<2?['Sitar']:['Sitar','808 Bass']}:{pat:k<2&&st==='stage'?'Jhoomar (slow)':'Bhangra Chaal',layers:k<2?['Algoza']:['Algoza','Tumbi']};
-  if(s.type==='build')return st==='club'?{pat:'Bhangra Hip-Hop',fill:last?8:null}:{pat:k>=s.bars-2?'Dhamaal':'Bhangra Chaal',layers:k<s.bars-2?['Tumbi']:[],fill:last?8:null};
-  if(s.type==='song')return{pat:st==='club'?'Bhangra Hip-Hop':st==='mashup'?['Bhangra Chaal','Luddi','Dhamaal'][s.idx%3]:'Bhangra Chaal',fill:last?(st==='mashup'?12:8):null};
-  if(s.type==='break')return st==='club'?{pat:'Dhol Trap',layers:['Shehnai','808 Bass'],fill:last?8:null}:{pat:k<4?'Dhol Solo':'Dhamaal',layers:k<4?['Tumbi']:['Tumbi','Algoza'],fill:last?4:null};
-  if(s.type==='finale')return{pat:st==='club'?'EDM Dhol Drop':'Dhamaal',fill:last?8:null};return null};
+  s.desc=`from ${fmt(inn)} · ${pre?`${pre}-bar ${entry==='hp'?'filter rise':'filter blend'} in`:'hard cut in'} · ${exit==='echo'?'echo-out':'cut'}`});
+ const PAT={empire:'Bhangra Chaal',ksr:'Dhol + 808 (Wedding)',club:'Bhangra Hip-Hop',medley:'Bhangra Chaal'};
+ const drumCfg=(s,k)=>{const last=k===s.bars-1,club=sty==='club';
+  if(s.type==='intro'){if(club)return{pat:'Keherwa (Tabla)',layers:k<2?['Sitar']:['Sitar','808 Bass']};if(ST.cut)return{pat:'Bhangra Chaal',layers:['Tumbi']};return{pat:k<2&&s.bars>2?'Jhoomar (slow)':'Bhangra Chaal',layers:k<2?['Algoza']:['Algoza','Tumbi']}}
+  if(s.type==='build'){if(club)return{pat:'Bhangra Hip-Hop',fill:last?8:null};return{pat:k>=s.bars-2?'Dhamaal':'Bhangra Chaal',layers:k<s.bars-2?['Tumbi']:[],fill:last?8:null}}
+  if(s.type==='song'){const pat=ST.cut?['Bhangra Chaal','Luddi','Dhamaal','EDM Dhol Drop'][s.idx%4]:sty==='medley'?(s.idx%2?'Luddi':'Bhangra Chaal'):PAT[sty];return{pat,fill:last?(ST.cut?12:8):null}}
+  if(s.type==='break'){if(club)return{pat:'Dhol Trap',layers:['Shehnai','808 Bass'],fill:last?8:null};const h=Math.max(1,s.bars/2);return{pat:k<h?'Dhol Solo':'Dhamaal',layers:k<h?['Tumbi']:['Tumbi','Algoza'],fill:last?4:null}}
+  if(s.type==='finale')return{pat:club||sty==='ksr'?'EDM Dhol Drop':'Dhamaal',fill:last?8:null};return null};
  secs.forEach(s=>{for(let k=0;k<s.bars;k++){const cfg=drumCfg(s,k);if(!cfg)continue;const bb=s.b0+k,tt=barT[bb],bpm=bpmBar[bb];
   at(tt,(E,B)=>{const sd=60/bpm/4;const pat=PRE[cfg.pat];const lim=cfg.fill!=null?cfg.fill:16;for(let st=0;st<lim;st++){const sw=(st%2)?S.swing*sd*.5:0;playStep(E,B+tt+st*sd+sw,st,bb,pat,cfg.layers||[],bpm,'i – i – VI – VII')}
    if(cfg.fill!=null)I.roll(E,E.drums,B+tt+cfg.fill*sd,.95,(16-cfg.fill)*sd)})}});
- // ---- risers, drops, shouts, ending
- const shout=(E,t,bar)=>{if(o.shouts){const v=(E.voxBufs||[]).map((x,i)=>x?i:-1).filter(i=>i>=0);if(v.length){playVox(E,v[bar%v.length],t,1);return}}if(o.style==='mashup')I.scratch(E,E.inst,t,.8);else I.airhorn(E,E.inst,t,.5)};
+ const shout=(E,t,bar)=>{if(o.shouts){const v=(E.voxBufs||[]).map((x,i)=>x?i:-1).filter(i=>i>=0);if(v.length){playVox(E,v[bar%v.length],t,1);return}}if(ST.cut)I.scratch(E,E.inst,t,.8);else I.airhorn(E,E.inst,t,.5)};
  secs.forEach((s,si)=>{const tb0=barT[s.b0];
-  if(s.type==='build'){const dur=barT[s.b1]-tb0;at(tb0,(E,B)=>{I.riser(E,E.inst,B+tb0,.75,dur);I.revCymbal(E,E.inst,B+barT[s.b1]-1.6,.6,1.6)})}
-  if(s.type==='song'){const pv=secs[si-1];if(pv&&pv.type!=='build'&&o.style!=='mashup'){const ta=barT[s.b0-2];at(ta,(E,B)=>I.riser(E,E.inst,B+ta,.5,tb0-ta))}
-   at(tb0,(E,B)=>{const t=B+tb0;if(o.style!=='mashup'||s.idx%2===0)I.impact(E,E.inst,t,.75);shout(E,t,s.b0);if(o.style==='club')[0,2,4].forEach(k=>I.sawStab(E,E.inst,t,freqDeg(k,4),.5,.6));if(o.style==='mashup')I.scratch(E,E.inst,t-.42,.6)})}
+  if(s.type==='build'){const dur=barT[s.b1]-tb0;at(tb0,(E,B)=>{I.riser(E,E.inst,B+tb0,.75,dur);I.revCymbal(E,E.inst,B+barT[s.b1]-Math.min(1.6,dur),.6,Math.min(1.6,dur))})}
+  if(s.type==='song'){const pv=secs[si-1];if(pv&&pv.type!=='build'&&!ST.cut){const ta=barT[Math.max(0,s.b0-2)];at(ta,(E,B)=>I.riser(E,E.inst,B+ta,sty==='medley'?.3:.5,tb0-ta))}
+   at(tb0,(E,B)=>{const t=B+tb0;if(sty==='medley'){if(s.idx%2===0)I.impact(E,E.inst,t,.45);return}
+    if(!ST.cut||s.idx%2===0)I.impact(E,E.inst,t,.75);if(!ST.cut||s.idx%2===1)shout(E,t,s.b0);
+    if(sty==='club')[0,2,4].forEach(k=>I.sawStab(E,E.inst,t,freqDeg(k,4),.5,.6));
+    if(sty==='ksr'){I.dagga(E,E.drums,t,1);I.tilli(E,E.drums,t,1);I.chimta(E,E.drums,t,1)}
+    if(ST.cut)I.scratch(E,E.inst,t-.42,.6)})}
   if(s.type==='break'){at(tb0,(E,B)=>{I.downlifter(E,E.inst,B+tb0,.55,240/M);I.impact(E,E.inst,B+tb0,.55)});const rb=Math.max(s.b0,s.b1-4),ta=barT[rb];at(ta,(E,B)=>I.riser(E,E.inst,B+ta,.65,barT[s.b1]-ta))}
   if(s.type==='finale'){at(tb0,(E,B)=>{shout(E,B+tb0,s.b0+1);I.airhorn(E,E.inst,B+tb0+.05,.55)})}
   if(s.type==='outro'){const bl=60/bpmBar[s.b0];at(tb0,(E,B)=>{for(let k=0;k<3;k++){const x=B+tb0+k*bl;I.dagga(E,E.drums,x,1);I.tilli(E,E.drums,x,1);I.chimta(E,E.drums,x,.9)}
-   const xe=B+tb0+3*bl;I.impact(E,E.inst,xe,1);if(o.style==='club')I.subDrop(E,E.inst,xe,.9);else I.airhorn(E,E.inst,xe,.55);I.dagga(E,E.drums,xe,1);I.tilli(E,E.drums,xe,1)})}
+   const xe=B+tb0+3*bl;I.impact(E,E.inst,xe,1);if(sty==='club')I.subDrop(E,E.inst,xe,.9);else I.airhorn(E,E.inst,xe,.55);I.dagga(E,E.drums,xe,1);I.tilli(E,E.drums,xe,1)})}
   s.t0=tb0;s.t1=barT[s.b1];
-  const D0={intro:o.style==='club'?'Tabla keherwa, sitar & 808 in your key':'Dhol jhoomar into chaal with algoza & tumbi',build:`${nm(T[0])} rises through a filter sweep · riser · dhol roll`,
-   break:o.style==='club'?'Dhol trap break with shehnai & 808':'Songs out — dhol & tumbi solo, then rebuild',finale:o.speed&&o.style!=='club'?`Speed-up: ${M} → ${bpmBar[s.b1-1]} BPM, dhamaal dhol`:'Full-power dhol drop',outro:'DHA · DHA · DHA — final hit'};
+  const D0={intro:sty==='club'?'Tabla keherwa, sitar & 808 in your key':'Dhol jhoomar into chaal with algoza & tumbi',build:`${nm(T[0])} rises through a filter sweep · riser · dhol roll`,
+   break:sty==='club'?'Dhol trap break with shehnai & 808':'Songs out — dhol & tumbi solo, then rebuild',finale:o.speed?`Speed-up: ${M} → ${bpmBar[s.b1-1]} BPM, dhamaal dhol`:'Full-power dhol drop',outro:'DHA · DHA · DHA — final hit'};
   if(D0[s.type])s.desc=D0[s.type]});
  ev.sort((a,b)=>a.t-b.t);
  return{events:ev,secs,total:barT[NB]+3.5,T,o,M,barT}}
 function prepPlan(E,plan){const tt=E.ctx.currentTime;for(const N of E.decks){[N.vol.gain,N.sendE.gain,N.sendR.gain,N.hp.frequency,N.lp.frequency,N.low.gain,N.mid.gain,N.high.gain,N.xg.gain].forEach(p=>p.cancelScheduledValues(tt));
  N.vol.gain.setValueAtTime(0,tt);N.sendE.gain.setValueAtTime(0,tt);N.sendR.gain.setValueAtTime(0,tt);N.hp.frequency.setValueAtTime(20,tt);N.lp.frequency.setValueAtTime(E.LP,tt);[N.low,N.mid,N.high].forEach(b=>b.gain.setValueAtTime(0,tt));N.xg.gain.setValueAtTime(1,tt);setRatio(N.tuner,1,tt);if(N.tuner.port)N.tuner.port.postMessage({at:false})}
- plan.T.forEach(d=>E.decks[d.i].trim.gain.setValueAtTime(d.an.trim,tt));E.drums.gain.setValueAtTime(plan.o.dhol,tt);E.melo.gain.setValueAtTime(.5,tt);E.voxBufs=vox.slice();
+ E.drums.gain.setValueAtTime(plan.o.dhol,tt);E.melo.gain.setValueAtTime(.5,tt);E.voxBufs=vox.slice();
  if(E.voxT.port)E.voxT.port.postMessage(Object.assign(tuneCfg(),{at:S.voxAT}));applyFx(E);E.planSrc=[];E.planAll=[]}
-function showPlan(plan){const st=$('#stages');st.innerHTML=plan.secs.map((s,i)=>`<div class="stage" data-i="${i}"><i style="background:${s.type==='song'?DECK_COL[plan.T[s.tr].i]:SEC_COL[s.type]}"></i><div><b>${i+1}. ${s.name}</b><small>${fmt(s.t0)}–${fmt(s.t1)} · ${s.bars} bars${s.desc?' · '+s.desc:''}</small></div></div>`).join('');
+function showPlan(plan){const st=$('#stages');st.innerHTML=plan.secs.map((s,i)=>`<div class="stage" data-i="${i}"><i style="background:${s.type==='song'?PAL[s.tr%8]:SEC_COL[s.type]}"></i><div><b>${i+1}. ${s.name}</b><small>${fmt(s.t0)}–${fmt(s.t1)} · ${s.bars} bars${s.desc?' · '+s.desc:''}</small></div></div>`).join('');
  $('#rx-status').textContent=`${plan.secs.length} stages · ${fmt(plan.total)} · ${plan.M} BPM`;PL.plan=plan;drawTL()}
 function drawTL(pt){const c=$('#tl'),dpr=devicePixelRatio||1,w=c.clientWidth*dpr|0,h=c.clientHeight*dpr|0;if(!w)return;if(c.width!==w)c.width=w;if(c.height!==h)c.height=h;const g=c.getContext('2d');g.clearRect(0,0,w,h);
- const p=PL.plan;if(!p){g.fillStyle='#4a3f57';g.font=`${12*dpr}px system-ui`;g.fillText('Load 2–3 songs, then BUILD PLAN to see the stage timeline',12*dpr,h/2+4*dpr);return}
- p.secs.forEach(s=>{const x0=s.t0/p.total*w,x1=s.t1/p.total*w;g.fillStyle=s.type==='song'?DECK_COL[p.T[s.tr].i]:SEC_COL[s.type];g.globalAlpha=.85;g.fillRect(x0+1,8*dpr,x1-x0-2,h-16*dpr);g.globalAlpha=1;
+ const p=PL.plan;if(!p){g.fillStyle='#4a3f57';g.font=`${12*dpr}px system-ui`;g.fillText('Add 2 or more songs with audio, then pick a style to see the stage timeline',12*dpr,h/2+4*dpr);return}
+ p.secs.forEach(s=>{const x0=s.t0/p.total*w,x1=s.t1/p.total*w;g.fillStyle=s.type==='song'?PAL[s.tr%8]:SEC_COL[s.type];g.globalAlpha=.85;g.fillRect(x0+1,8*dpr,x1-x0-2,h-16*dpr);g.globalAlpha=1;
   g.fillStyle='#0c0a0f';g.font=`bold ${10.5*dpr}px system-ui`;g.save();g.beginPath();g.rect(x0,0,x1-x0-4,h);g.clip();g.fillText(s.name,x0+6*dpr,h/2+4*dpr);g.restore()});
  if(pt!=null){const x=pt/p.total*w;g.fillStyle='#fff';g.fillRect(x-dpr,0,2*dpr,h)}}
 function startPlan(){let plan;try{plan=buildPlan()}catch(e){toast(e.message);return}showPlan(plan);decks.forEach(d=>d.pause());if(clock.running)clockStop();stopPlan();
@@ -626,7 +686,7 @@ async function renderPlan(){let plan;try{plan=buildPlan()}catch(e){toast(e.messa
   const out=await oc.startRendering();const L=out.getChannelData(0),R=out.getChannelData(1);let pk=0;for(let i=0;i<L.length;i++){const a=Math.abs(L[i]),b=Math.abs(R[i]);if(a>pk)pk=a;if(b>pk)pk=b}
   if(pk>.977){const g=.977/pk;for(let i=0;i<L.length;i++){L[i]*=g;R[i]*=g}}let e=L.length;while(e>sr&&Math.abs(L[e-1])<1e-4&&Math.abs(R[e-1])<1e-4)e--;
   st.textContent=`Encoding ${fmt.toUpperCase()}…`;const ex=await exportAudio(L.subarray(0,e),R.subarray(0,e),sr,fmt,bits,p=>st.textContent=`Encoding MP3… ${Math.round(p*100)}%`);
-  const name=`DholDeck-${plan.o.style}-remix-${stamp()}.${ex.ext}`;addOutput(ex.blob,name,`${plan.o.style==='stage'?'Bhangra Stage Mix':plan.o.style==='club'?'Club Remix':'Mashup'} · ${ex.label}`);
+  const name=`DholDeck-${plan.o.style}-remix-${stamp()}.${ex.ext}`;addOutput(ex.blob,name,`${STYLES[plan.o.style].name} · ${ex.label}`);
   st.textContent=`Done · ${fmtT(e/sr)} · ${ex.label}`;toast('Remix rendered — download started')}catch(e){console.error(e);st.textContent='Render failed: '+e.message}btn.disabled=false}
 
 /* ====================== UI ====================== */
@@ -672,7 +732,7 @@ let taps=[];$('#tap').onclick=()=>{const n=performance.now();taps=taps.filter(x=
 $('#key').onchange=()=>{S.key=+$('#key').value;sendTune()};$('#scale').onchange=()=>{S.scale=$('#scale').value;sendTune()};
 $('#mvol').oninput=()=>{S.mvol=+$('#mvol').value;if(E)E.master.gain.setTargetAtTime(S.mvol,ctx.currentTime,.02)};
 let REC=null;$('#rec').onclick=async()=>{if(!E)return;if(!REC){REC={cap:capture(E.master),t0:ctx.currentTime};$('#rec').classList.add('on');$('#rec').textContent='■ STOP';toast('Recording everything you play — press STOP to save an HD WAV')}
- else{const r=REC;REC=null;$('#rec').classList.remove('on');$('#rec').textContent='● REC';const[L,R]=await r.cap.stop();if(!L.length)return toast('Nothing recorded');const[rf,rq]=$('#recq').value.split('-');toast('Saving recording…');const ex=await exportAudio(L,R,ctx.sampleRate,rf,+rq);addOutput(ex.blob,`DholDeck-live-${stamp()}.${ex.ext}`,`Live session · ${ex.label}`);toast('Saved — see Auto Remix › downloads');location.hash='#s-remix'}};
+ else{const r=REC;REC=null;$('#rec').classList.remove('on');$('#rec').textContent='● REC';const[L,R]=await r.cap.stop();if(!L.length)return toast('Nothing recorded');const[rf,rq]=$('#recq').value.split('-');toast('Saving recording…');const ex=await exportAudio(L,R,ctx.sampleRate,rf,+rq);addOutput(ex.blob,`DholDeck-live-${stamp()}.${ex.ext}`,`Live session · ${ex.label}`);toast('Saved — see Mashup Studio › Your downloads');showView('mash')}};
 /* ----- decks ----- */
 const dk=el=>+el.closest('.deck').dataset.d;
 $('#decks').addEventListener('click',e=>{const b=e.target.closest('[data-a],[data-loop]');if(!b||!E)return;const i=dk(b),d=decks[i];
@@ -695,11 +755,11 @@ function updDeckInfo(i){const d=D[i],r=$$('.deck')[i];r.querySelector('.dn').tex
 async function loadFile(i,file){if(!E)return;toast(`Analysing ${file.name}…`,8000);let buf;try{buf=await ctx.decodeAudioData(await file.arrayBuffer())}catch(e){toast('Could not decode this file — try MP3, WAV or M4A.');return}
  const d=decks[i];d.pause();d.pos=0;d.loop=null;d.rate=1;d.synced=false;const r=$$('.deck')[i];r.querySelector('[data-k=tempo]').value=0;r.querySelector('[data-o=tempo]').textContent='0';
  const dd=D[i];dd.buf=buf;dd.name=file.name.replace(/\.[^.]+$/,'');await new Promise(r=>setTimeout(r,30));dd.an=analyze(buf);dd.bt=60/dd.an.bpm;dd.inPoint=bestStarts(dd,64,16)[0];dd.userIn=false;W[i]=null;
- applyDeckUI(i);d.pitch();updDeckInfo(i);PL.plan=null;toast(`Deck ${'ABC'[i]}: ${dd.an.bpm} BPM detected`);if(D.filter(x=>x.an).length>=2){try{showPlan(buildPlan())}catch(e){}}}
+ applyDeckUI(i);d.pitch();updDeckInfo(i);PL.plan=null;toast(`Deck ${'ABC'[i]}: ${dd.an.bpm} BPM detected`);}
 /* ----- remix ----- */
 $('#rx-build').onclick=()=>{try{showPlan(buildPlan())}catch(e){toast(e.message)}};
 $('#rx-play').onclick=()=>{if(E)startPlan()};$('#rx-stop').onclick=()=>{if(E)stopPlan()};$('#rx-render').onclick=()=>{if(E)renderPlan()};
-['#rx-style','#rx-len','#rx-bpm','#rx-speed','#rx-keep','#rx-shout'].forEach(s=>$(s).addEventListener('change',()=>{if(D.filter(x=>x.an).length>=2&&!PL.running)try{showPlan(buildPlan())}catch(e){}}));
+['#rx-style','#rx-len','#rx-bpm','#rx-speed','#rx-keep','#rx-shout'].forEach(s=>$(s).addEventListener('change',()=>{autoPlan()}));
 $('#rx-dhol').oninput=()=>{if(PL.running)E.drums.gain.setTargetAtTime(+$('#rx-dhol').value,ctx.currentTime,.05)};
 /* ----- beat maker ----- */
 $('#bm-play').onclick=()=>{if(!E)return;clock.running?clockStop():clockStart()};
@@ -741,6 +801,68 @@ $('#vox').addEventListener('input',e=>{if(e.target.type==='text'&&ptab==='Shouts
 const pct=v=>Math.round(v*100)+'%';
 [['fx-fb','fb','o-fb'],['fx-er','er','o-er'],['fx-rr','rr','o-rr'],['fx-pr','pr','o-pr'],['fx-gl','glue','o-gl']].forEach(([id,k,o])=>$('#'+id).oninput=()=>{S.fx[k]=+$('#'+id).value;$('#'+o).textContent=pct(S.fx[k]);if(E)applyFx(E)});
 $('#fx-et').onchange=()=>{S.fx.et=+$('#fx-et').value;if(E)applyFx(E)};
+
+/* ----- views ----- */
+function showView(v){$('#view-dj').hidden=v!=='dj';$('#view-mash').hidden=v!=='mash';$$('.vt').forEach(b=>b.classList.toggle('on',b.dataset.view===v));W.fill(null);if(v==='mash')requestAnimationFrame(()=>drawTL());try{history.replaceState(null,'',v==='mash'?'#mashup':location.pathname)}catch(e){}}
+$$('.vt').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+$$('nav.views .jump a').forEach(a=>a.addEventListener('click',()=>showView('dj')));
+setTimeout(()=>{if(location.hash==='#mashup')showView('mash')},0);
+/* ----- mashup crate ----- */
+const CR=[];let crId=1;
+const esc=x=>String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function crAdd(x){const c=Object.assign({id:crId++,on:true,name:'',buf:null,an:null,kind:'file'},x);CR.push(c);return c}
+function prepTrack(c,buf){c.buf=buf;c.an=analyze(buf);c.bt=60/c.an.bpm}
+function autoPlan(){if(PL.running)return;if(CR.filter(c=>c.on&&c.buf).length>=2){try{showPlan(buildPlan())}catch(e){}}else{PL.plan=null;$('#stages').innerHTML='';$('#rx-status').textContent='';drawTL()}}
+function enforceMem(){const L=CR.filter(c=>c.buf);if(L.length<5)return;L.forEach(c=>{if(c.cropped||c.an.dur<150)return;const st=bestStarts(c,64,16)[0];const a=Math.max(0,st-25),b=Math.min(c.an.dur,a+135);const sr=c.buf.sampleRate,i0=Math.floor(a*sr),n=Math.floor((b-a)*sr);
+ const nb=ctx.createBuffer(c.buf.numberOfChannels,n,sr);for(let ch=0;ch<c.buf.numberOfChannels;ch++)nb.copyToChannel(c.buf.getChannelData(ch).subarray(i0,i0+n),ch);prepTrack(c,nb);c.cropped=true})}
+async function crAttach(c,file){if(!E)return toast('Tap “Enter the studio” first');c.status='Analysing…';renderCrate();
+ try{const buf=await ctx.decodeAudioData(await file.arrayBuffer());await new Promise(z=>setTimeout(z,10));prepTrack(c,buf);c.file=file.name;c.cropped=false;if(c.kind==='file'||!c.name)c.name=file.name.replace(/\.[^.]+$/,'');c.status=''}
+ catch(e){c.status='⚠ Could not read this file — try MP3, WAV or M4A'}enforceMem();renderCrate();autoPlan()}
+const STOPW=new Set('official video audio song songs lyrical lyric lyrics full latest punjabi hindi new feat remix mp3 kbps the and with from music track version visualizer original'.split(' '));
+const toks=x=>(x||'').toLowerCase().replace(/[^a-z0-9ऀ-ൿ]+/g,' ').split(/\s+/).filter(w=>w.length>=3&&!STOPW.has(w)&&!/^\d+kbps$/.test(w));
+async function crFiles(files){const list=[...files].filter(f=>/^(audio|video)\//.test(f.type)||/\.(mp3|wav|m4a|aac|flac|ogg|opus|mp4|webm)$/i.test(f.name));if(!list.length)return toast('No audio files found');
+ for(const f of list){const ft=toks(f.name);let best=null,bs=0;for(const c of CR){if(c.buf||c.kind==='file'||c.status==='Analysing…')continue;const sc=toks(c.name).filter(w=>ft.includes(w)).length;if(sc>bs){bs=sc;best=c}}
+  await crAttach(best||crAdd({kind:'file',name:f.name.replace(/\.[^.]+$/,'')}),f)}
+ toast(`${list.length} file${list.length>1?'s':''} added`)}
+function parseLink(u){u=u.trim().replace(/^(?:[-•*]|\d{1,3}[.)])\s*/,'').trim();if(!u)return null;let m;
+ if(m=u.match(/(?:youtu\.be\/|[?&]v=|shorts\/|embed\/|live\/)([\w-]{11})/))return{kind:'yt',id:m[1],url:u,name:'YouTube video'};
+ if(/music\.apple\.com|itunes\.apple\.com/.test(u)){let slug='Apple Music track';try{const p=new URL(u).pathname.split('/').filter(Boolean);slug=decodeURIComponent(p[2]||slug).replace(/-/g,' ')}catch(e){}return{kind:'am',url:u,name:slug}}
+ if(/^https?:\/\//.test(u))return{kind:'web',url:u,name:u.replace(/^https?:\/\/(www\.)?/,'').slice(0,60)};
+ return{kind:'text',name:u.slice(0,120)}}
+function fetchMeta(c){
+ if(c.kind==='yt'){const u='https://www.youtube.com/watch?v='+c.id;fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent(u)).then(r=>r.ok?r.json():Promise.reject()).catch(()=>fetch('https://noembed.com/embed?url='+encodeURIComponent(u)).then(r=>r.json()))
+  .then(j=>{if(j&&j.title){c.name=j.title;c.artist=j.author_name||'';renderCrate()}}).catch(()=>{})}
+ if(c.kind==='am'){const m=c.url.match(/[?&]i=(\d+)/)||c.url.match(/\/(\d{6,})(?:[?#]|$)/);if(!m)return;const cb='__am'+c.id;
+  window[cb]=j=>{const r=j&&j.results&&j.results[0];if(r){c.name=r.trackName||r.collectionName||c.name;c.artist=r.artistName||'';c.art=r.artworkUrl100;renderCrate()}try{delete window[cb]}catch(e){}};
+  const sc=document.createElement('script');sc.src=`https://itunes.apple.com/lookup?id=${m[1]}&callback=${cb}`;sc.onerror=()=>sc.remove();document.head.appendChild(sc)}}
+function renderCrate(){const el=$('#crate');const n=CR.filter(c=>c.on&&c.buf).length,w=CR.filter(c=>!c.buf).length;$('#crate-info').textContent=`${n} song${n===1?'':'s'} ready${w?` · ${w} waiting for audio`:''}`;
+ if(!CR.length){el.innerHTML='<div class="sub" style="padding:10px 4px;margin:0">No songs yet — paste links or song names, or drop audio files above.</div>';return}
+ el.innerHTML=CR.map((c,i)=>{const th=c.kind==='yt'?`<img src="https://i.ytimg.com/vi/${c.id}/mqdefault.jpg" alt="" loading="lazy" onerror="this.outerHTML='<div class=ph>♪</div>'">`:c.art?`<img src="${esc(c.art)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=ph>♪</div>'">`:`<div class="ph">♪</div>`;
+  const src={yt:'YouTube',am:'Apple Music',web:'Link',text:'Song name',file:'Audio file'}[c.kind];
+  const info=c.status?c.status:c.an?`✓ ${c.an.bpm} BPM · ${fmt(c.an.dur)}${c.cropped?' (best part kept to save memory)':''}${c.file&&c.kind!=='file'?' · '+esc(c.file):''}`:'⚠ Needs its audio file — drop it here or tap Attach';
+  return`<div class="cr${c.buf?' ok':''}${c.on?'':' off'}" data-c="${c.id}"><span class="n">${i+1}</span>${th}<div class="ci"><b title="${esc(c.name)}">${esc(c.name)}</b><small>${c.artist?esc(c.artist)+' · ':''}${src}${c.url?` · <a href="${esc(c.url)}" target="_blank" rel="noopener">open ↗</a>`:''}</small><small class="${c.buf?'good':'warn'}">${info}</small></div>
+  <label class="btn sm">${c.buf?'REPLACE':'ATTACH AUDIO'}<input type="file" accept="audio/*,video/mp4,.mp3,.wav,.m4a,.aac,.flac,.ogg,.mp4" hidden data-att="${c.id}"></label>
+  <label class="btn sm" title="Include in the mashup"><input type="checkbox" data-on="${c.id}" ${c.on?'checked':''} style="margin:0 4px 0 0;width:13px;height:13px">USE</label>
+  <button class="btn sm" data-mv="-1" title="Move up">↑</button><button class="btn sm" data-mv="1" title="Move down">↓</button><button class="btn sm" data-rm="1" title="Remove">✕</button></div>`}).join('')}
+renderCrate();
+const crOf=el=>{const r=el.closest('.cr');return r?CR.find(c=>c.id===+r.dataset.c):null};
+$('#links-add').onclick=()=>{const t=$('#links').value;const lines=t.split(/\n+/).flatMap(l=>l.split(/\s+(?=https?:\/\/)/)).map(x=>x.trim()).filter(Boolean);let k=0;
+ for(const l of lines){const p=parseLink(l);if(!p)continue;if(p.url&&CR.some(c=>c.url===p.url))continue;fetchMeta(crAdd(p));k++}$('#links').value='';renderCrate();toast(k?`${k} song${k>1?'s':''} added — now drop in their audio files`:'Nothing new to add')};
+$('#crate-files').onchange=e=>{crFiles(e.target.files);e.target.value=''};
+const dz=$('#crate-drop');['dragover','dragenter'].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.add('on')}));dz.addEventListener('dragleave',()=>dz.classList.remove('on'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('on');crFiles(e.dataTransfer.files)});
+$('#crate').addEventListener('dragover',e=>{const r=e.target.closest('.cr');if(!r)return;e.preventDefault();$$('.cr.drag').forEach(x=>x.classList.remove('drag'));r.classList.add('drag')});
+$('#crate').addEventListener('dragleave',e=>{const r=e.target.closest('.cr');if(r)r.classList.remove('drag')});
+$('#crate').addEventListener('drop',e=>{const c=crOf(e.target);if(!c)return;e.preventDefault();$$('.cr.drag').forEach(x=>x.classList.remove('drag'));const f=e.dataTransfer.files[0];if(f)crAttach(c,f)});
+$('#crate').addEventListener('change',e=>{const el=e.target;const c=crOf(el);if(!c)return;if(el.dataset.att&&el.files[0]){crAttach(c,el.files[0]);el.value=''}if(el.dataset.on){c.on=el.checked;renderCrate();autoPlan()}});
+$('#crate').addEventListener('click',e=>{const b=e.target.closest('[data-mv],[data-rm]');if(!b)return;const c=crOf(b);const i=CR.indexOf(c);
+ if(b.dataset.rm){CR.splice(i,1)}else{const j=i+ +b.dataset.mv;if(j<0||j>=CR.length)return;CR.splice(i,1);CR.splice(j,0,c)}renderCrate();autoPlan()});
+$('#crate-decks').onclick=()=>{let k=0;D.forEach(d=>{if(d.buf&&!CR.some(c=>c.buf===d.buf)){crAdd({kind:'file',name:d.name,buf:d.buf,an:d.an,bt:d.bt,inPoint:d.inPoint,userIn:d.userIn});k++}});enforceMem();renderCrate();autoPlan();toast(k?`${k} deck song${k>1?'s':''} added`:'Load songs on the decks first')};
+$('#crate-bpm').onclick=()=>{CR.sort((a,b)=>(a.an?a.an.bpm:999)-(b.an?b.an.bpm:999));renderCrate();autoPlan()};
+$('#crate-shuf').onclick=()=>{for(let i=CR.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[CR[i],CR[j]]=[CR[j],CR[i]]}renderCrate();autoPlan()};
+$('#crate-clear').onclick=()=>{if(PL.running)stopPlan();CR.length=0;renderCrate();autoPlan()};
+$('#styles').addEventListener('click',e=>{const b=e.target.closest('[data-style]');if(!b)return;$$('.sty').forEach(x=>x.classList.toggle('on',x===b));$('#rx-style').value=b.dataset.style;
+ $('#rx-speed').checked=STYLES[b.dataset.style].speed;$('#rx-speed').disabled=!STYLES[b.dataset.style].speed;if(PL.running)stopPlan();autoPlan()});
 
 /* ----- init & render loop ----- */
 const W=[null,null,null];
