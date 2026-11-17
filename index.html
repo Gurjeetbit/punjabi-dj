@@ -208,8 +208,8 @@ footer{color:var(--mu);text-align:center;font-size:11.5px;padding:0 20px 30px}
   <p class="sub">Add as many songs as you like. Paste YouTube, YouTube Music or Apple Music links (or just song names) to set the running order, then drop in the audio files. Files whose names match a pasted song attach to it automatically.</p>
   <div class="two">
     <div><div class="lbl" style="margin-bottom:6px">Paste links or song names — one per line</div>
-      <textarea id="links" rows="6" placeholder="https://youtu.be/...&#10;https://music.apple.com/in/album/...?i=...&#10;Lover - Diljit Dosanjh"></textarea>
-      <div class="row"><button class="btn on" id="links-add">ADD TO LIST</button><span class="sub" style="margin:0">Browsers can't pull audio out of YouTube or Apple Music, so each link needs its audio file.</span></div></div>
+      <textarea id="links" rows="6" placeholder="https://example.com/songs/my-track.mp3&#10;https://youtu.be/...&#10;https://music.apple.com/in/album/...?i=...&#10;Lover - Diljit Dosanjh"></textarea>
+      <div class="row"><button class="btn on" id="links-add">ADD TO LIST</button><span class="sub" style="margin:0">Direct MP3/WAV links (and Dropbox, GitHub, archive.org) load by themselves. YouTube, Apple Music and sites that block sharing need the audio file dropped in.</span></div></div>
     <div class="drop" id="crate-drop"><b style="color:var(--tx)">⬇ Drop audio files here</b><span>MP3 · WAV · M4A · FLAC · MP4 — several at once</span><div><label class="btn on">CHOOSE FILES<input type="file" multiple accept="audio/*,video/mp4,.mp3,.wav,.m4a,.aac,.flac,.ogg,.mp4" hidden id="crate-files"></label></div></div>
   </div>
   <div class="row" style="margin-top:12px"><span class="lbl" id="crate-info">0 songs ready</span><span style="flex:1"></span><button class="btn sm" id="crate-decks">+ SONGS FROM DECKS</button><button class="btn sm" id="crate-bpm">SORT BY BPM</button><button class="btn sm" id="crate-shuf">SHUFFLE</button><button class="btn sm" id="crate-clear">CLEAR</button></div>
@@ -815,8 +815,9 @@ function prepTrack(c,buf){c.buf=buf;c.an=analyze(buf);c.bt=60/c.an.bpm}
 function autoPlan(){if(PL.running)return;if(CR.filter(c=>c.on&&c.buf).length>=2){try{showPlan(buildPlan())}catch(e){}}else{PL.plan=null;$('#stages').innerHTML='';$('#rx-status').textContent='';drawTL()}}
 function enforceMem(){const L=CR.filter(c=>c.buf);if(L.length<5)return;L.forEach(c=>{if(c.cropped||c.an.dur<150)return;const st=bestStarts(c,64,16)[0];const a=Math.max(0,st-25),b=Math.min(c.an.dur,a+135);const sr=c.buf.sampleRate,i0=Math.floor(a*sr),n=Math.floor((b-a)*sr);
  const nb=ctx.createBuffer(c.buf.numberOfChannels,n,sr);for(let ch=0;ch<c.buf.numberOfChannels;ch++)nb.copyToChannel(c.buf.getChannelData(ch).subarray(i0,i0+n),ch);prepTrack(c,nb);c.cropped=true})}
-async function crAttach(c,file){if(!E)return toast('Tap “Enter the studio” first');c.status='Analysing…';renderCrate();
- try{const buf=await ctx.decodeAudioData(await file.arrayBuffer());await new Promise(z=>setTimeout(z,10));prepTrack(c,buf);c.file=file.name;c.cropped=false;if(c.kind==='file'||!c.name)c.name=file.name.replace(/\.[^.]+$/,'');c.status=''}
+async function crAttach(c,file){return crAttachAB(c,()=>file.arrayBuffer(),file.name)}
+async function crAttachAB(c,getAB,fname){if(!E)return toast('Tap “Enter the studio” first');c.status='Analysing…';renderCrate();
+ try{const buf=await ctx.decodeAudioData(await getAB());await new Promise(z=>setTimeout(z,10));prepTrack(c,buf);c.file=fname;c.cropped=false;if(c.kind==='file'||!c.name)c.name=fname.replace(/\.[^.]+$/,'');c.status=''}
  catch(e){c.status='⚠ Could not read this file — try MP3, WAV or M4A'}enforceMem();renderCrate();autoPlan()}
 const STOPW=new Set('official video audio song songs lyrical lyric lyrics full latest punjabi hindi new feat remix mp3 kbps the and with from music track version visualizer original'.split(' '));
 const toks=x=>(x||'').toLowerCase().replace(/[^a-z0-9ऀ-ൿ]+/g,' ').split(/\s+/).filter(w=>w.length>=3&&!STOPW.has(w)&&!/^\d+kbps$/.test(w));
@@ -827,9 +828,17 @@ async function crFiles(files){const list=[...files].filter(f=>/^(audio|video)\//
 function parseLink(u){u=u.trim().replace(/^(?:[-•*]|\d{1,3}[.)])\s*/,'').trim();if(!u)return null;let m;
  if(m=u.match(/(?:youtu\.be\/|[?&]v=|shorts\/|embed\/|live\/)([\w-]{11})/))return{kind:'yt',id:m[1],url:u,name:'YouTube video'};
  if(/music\.apple\.com|itunes\.apple\.com/.test(u)){let slug='Apple Music track';try{const p=new URL(u).pathname.split('/').filter(Boolean);slug=decodeURIComponent(p[2]||slug).replace(/-/g,' ')}catch(e){}return{kind:'am',url:u,name:slug}}
- if(/^https?:\/\//.test(u))return{kind:'web',url:u,name:u.replace(/^https?:\/\/(www\.)?/,'').slice(0,60)};
+ if(/^https?:\/\//.test(u)){let nmx=u;try{const q=new URL(u);const last=decodeURIComponent(q.pathname.split('/').filter(Boolean).pop()||q.hostname);nmx=last.replace(/\.(mp3|wav|m4a|aac|flac|ogg|opus)$/i,'').replace(/[_+]/g,' ')}catch(e){}return{kind:'web',url:u,name:nmx.slice(0,80)}}
  return{kind:'text',name:u.slice(0,120)}}
-function fetchMeta(c){
+function directURL(u){let m;
+ if(/dropbox\.com/.test(u))return u.replace(/^https?:\/\/(www\.)?dropbox\.com/,'https://dl.dropboxusercontent.com').replace(/[?&]dl=0/,'');
+ if(m=u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?.*id=)([\w-]{20,})/))return'https://drive.google.com/uc?export=download&id='+m[1];
+ if(m=u.match(/^https:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/(.+)$/))return'https://raw.githubusercontent.com/'+m[1]+'/'+m[2];return u}
+async function fetchWeb(c){if(!E)return;const u=directURL(c.url);c.status='Downloading from the link…';renderCrate();
+ try{const r=await fetch(u,{mode:'cors'});if(!r.ok)throw new Error('HTTP '+r.status);const ct=r.headers.get('content-type')||'';if(/text\/html/.test(ct))throw new Error('page');
+  const ab=await r.arrayBuffer();if(ab.byteLength<20000)throw new Error('small');let fn=c.name;await crAttachAB(c,()=>Promise.resolve(ab),fn+'.mp3');if(!c.buf)throw new Error('decode');c.file='from link';renderCrate();toast(`Loaded “${c.name}” from the link`)}
+ catch(e){c.status=e.message==='page'?'⚠ That link opens a web page, not an audio file — use the direct MP3 link, or download it and drop it here':'⚠ This site doesn’t let other pages load its files — download the MP3 and drop it on this row';renderCrate()}}
+function fetchMeta(c){if(c.kind==='web'){fetchWeb(c);return}
  if(c.kind==='yt'){const u='https://www.youtube.com/watch?v='+c.id;fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent(u)).then(r=>r.ok?r.json():Promise.reject()).catch(()=>fetch('https://noembed.com/embed?url='+encodeURIComponent(u)).then(r=>r.json()))
   .then(j=>{if(j&&j.title){c.name=j.title;c.artist=j.author_name||'';renderCrate()}}).catch(()=>{})}
  if(c.kind==='am'){const m=c.url.match(/[?&]i=(\d+)/)||c.url.match(/\/(\d{6,})(?:[?#]|$)/);if(!m)return;const cb='__am'+c.id;
@@ -838,7 +847,7 @@ function fetchMeta(c){
 function renderCrate(){const el=$('#crate');const n=CR.filter(c=>c.on&&c.buf).length,w=CR.filter(c=>!c.buf).length;$('#crate-info').textContent=`${n} song${n===1?'':'s'} ready${w?` · ${w} waiting for audio`:''}`;
  if(!CR.length){el.innerHTML='<div class="sub" style="padding:10px 4px;margin:0">No songs yet — paste links or song names, or drop audio files above.</div>';return}
  el.innerHTML=CR.map((c,i)=>{const th=c.kind==='yt'?`<img src="https://i.ytimg.com/vi/${c.id}/mqdefault.jpg" alt="" loading="lazy" onerror="this.outerHTML='<div class=ph>♪</div>'">`:c.art?`<img src="${esc(c.art)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=ph>♪</div>'">`:`<div class="ph">♪</div>`;
-  const src={yt:'YouTube',am:'Apple Music',web:'Link',text:'Song name',file:'Audio file'}[c.kind];
+  const src={yt:'YouTube',am:'Apple Music',web:'Web link',text:'Song name',file:'Audio file'}[c.kind];
   const info=c.status?c.status:c.an?`✓ ${c.an.bpm} BPM · ${fmt(c.an.dur)}${c.cropped?' (best part kept to save memory)':''}${c.file&&c.kind!=='file'?' · '+esc(c.file):''}`:'⚠ Needs its audio file — drop it here or tap Attach';
   return`<div class="cr${c.buf?' ok':''}${c.on?'':' off'}" data-c="${c.id}"><span class="n">${i+1}</span>${th}<div class="ci"><b title="${esc(c.name)}">${esc(c.name)}</b><small>${c.artist?esc(c.artist)+' · ':''}${src}${c.url?` · <a href="${esc(c.url)}" target="_blank" rel="noopener">open ↗</a>`:''}</small><small class="${c.buf?'good':'warn'}">${info}</small></div>
   <label class="btn sm">${c.buf?'REPLACE':'ATTACH AUDIO'}<input type="file" accept="audio/*,video/mp4,.mp3,.wav,.m4a,.aac,.flac,.ogg,.mp4" hidden data-att="${c.id}"></label>
